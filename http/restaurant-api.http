@@ -1,0 +1,11 @@
+
+#post feedback
+POST http://localhost:3000/api/feedback
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5paGFkYXp6YW05NkBnbWFpbC5jb20iLCJpYXQiOjE3Mzc2Njk0MTh9.lohYvY-SYc_EalfoMpytAMBpPG5WDigvSm_nwrVDsuY
+Content-Type: application/json
+
+{
+   "restaurant_id": 1,
+    "comment": "Amazing food!",
+    "rating": 5
+}
