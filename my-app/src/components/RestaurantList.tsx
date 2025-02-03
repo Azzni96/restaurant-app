@@ -1,33 +1,61 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Restaurant } from "../types/restaurant"; // Updated import path
+import { useNavigate } from 'react-router-dom';
+import './RestaurantList.css'; // Add this line
 
 const RestaurantList = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
     const fetchRestaurants = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/restaurant");
+        const response = await axios.get("http://localhost:3000/api/restaurant", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setRestaurants(response.data);
-      } catch (error) {
-        console.error("Error fetching restaurants:", error);
+      } catch (error: any) {
+        if (error.response?.status === 401) {
+          navigate("/login");
+        } else {
+          console.error("Error fetching restaurants:", error);
+        }
       }
     };
 
     fetchRestaurants();
-  }, []);
+  }, [navigate]);
+
+  const handleRestaurantClick = (restaurantId: number) => {
+    navigate(`/restaurants/${restaurantId}/menus`);
+  };
+
+  const handleFeedbackClick = (restaurantId: number) => {
+    navigate(`/restaurants/${restaurantId}/feedback`);
+  };
 
   return (
-    <div>
+    <div className="container">
       <h1>Restaurants</h1>
       <ul>
         {restaurants.map((restaurant) => (
           <li key={restaurant.id}>
-            <h2>{restaurant.name}</h2>
+            <h2 onClick={() => handleRestaurantClick(restaurant.id)} style={{ cursor: 'pointer' }}>
+              {restaurant.name}
+            </h2>
             <p>{restaurant.address}</p>
             <p>{restaurant.phone}</p>
             {restaurant.image && <img src={restaurant.image} alt={restaurant.name} />}
+            <button onClick={() => handleFeedbackClick(restaurant.id)}>View Feedback</button>
           </li>
         ))}
       </ul>

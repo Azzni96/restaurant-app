@@ -5,7 +5,6 @@ import upload from '../utils/multerConfig';
 const router = express.Router();
 
 router.get('/:restaurant_id', fetchMenus);
-router.post('/', upload.single('image'), addMenu);
-
+router.post('/:restaurant_id/menu', upload.single('image'), addMenu);
 
 export default router;

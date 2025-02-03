@@ -19,7 +19,8 @@ export const fetchMenus = async (req: Request, res: Response): Promise<void> => 
 
 export const addMenu = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { restaurant_id, name, description, price } = req.body;
+        const restaurant_id = parseInt(req.params.restaurant_id);
+        const { name, description, price } = req.body;
         const image = req.file?.filename;
         await createMenu({ restaurant_id, name, description, price, image });
         res.status(201).json({ message: "Menu added successfully" });

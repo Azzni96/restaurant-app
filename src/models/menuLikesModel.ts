@@ -42,3 +42,16 @@ export const getMenuLikes = async (menuId: number): Promise<MenuLike[]> => {
         conn.release();
     }
 };
+
+export const getUserLikes = async (userId: number): Promise<MenuLike[]> => {
+    const conn = await pool.getConnection();
+    try {
+        const rows = await conn.query(
+            "SELECT menu_id FROM menu_likes WHERE user_id = ?",
+            [userId]
+        );
+        return rows;
+    } finally {
+        conn.release();
+    }
+};

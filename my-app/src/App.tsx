@@ -8,9 +8,10 @@ import Profile from "./components/Profile";
 import ResetPassword from "./components/ResetPassword";
 import RestaurantList from "./components/RestaurantList";
 import MenuList from "./components/MenuList";
-import FeedbackList from "./components/FeedbackList";
 import MenuLikes from "./components/MenuLikes";
-
+import AddRestaurant from "./components/AddRestaurant";
+import AddMenu from "./components/AddMenu";
+import FeedbackList from "./components/FeedbackList"; // Ensure this import is present
 
 const App = () => {
   return (
@@ -26,7 +27,9 @@ const App = () => {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/restaurants" element={<RestaurantList />} />
             <Route path="/restaurants/:restaurantId/menus" element={<MenuList />} />
-            <Route path="/restaurants/:restaurantId/feedback" element={<FeedbackList />} />
+            <Route path="/add-restaurant" element={<AddRestaurant />} />
+            <Route path="/restaurants/:restaurantId/add-menu" element={<AddMenu />} />
+            <Route path="/restaurants/:restaurantId/feedback" element={<FeedbackList />} /> // Ensure this route path is correct
             <Route path="/menus/:menuId/likes" element={<MenuLikes />} />
           </Route>
         </Routes>

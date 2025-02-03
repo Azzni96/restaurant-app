@@ -28,4 +28,4 @@ export const addRestaurant = async (req:Request, res: Response, Next: NextFuncti
         res.status(500).json({error: err.message})
     }
 };
-    
+

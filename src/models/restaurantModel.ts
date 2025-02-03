@@ -1,4 +1,5 @@
 import pool from "../database/DB";
+import { Feedback } from "./feedbackModel"; // Import Feedback type
 
 export type Restaurant = {
     id?: number;
@@ -6,6 +7,7 @@ export type Restaurant = {
     address: string;
     phone: string;
     image?: string;
+    feedbacks?: Feedback[]; // Add feedbacks property
 };
 
 export const getAllRestaurants = async (): Promise<Restaurant[]> => {

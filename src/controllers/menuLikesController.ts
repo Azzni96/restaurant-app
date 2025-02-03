@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { addMenuLike, removeMenuLike, getMenuLikes } from "../models/menuLikesModel";
+import { addMenuLike, removeMenuLike, getMenuLikes, getUserLikes } from "../models/menuLikesModel";
 
 export const addLikeHandler = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -44,6 +44,18 @@ export const getLikesHandler = async (req: Request, res: Response): Promise<void
         const menuId = parseInt(req.params.menuId);
 
         const likes = await getMenuLikes(menuId);
+        res.status(200).json(likes);
+    } catch (error) {
+        const err = error as Error;
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const getUserLikesHandler = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = (req as any).user.id;
+
+        const likes = await getUserLikes(userId);
         res.status(200).json(likes);
     } catch (error) {
         const err = error as Error;

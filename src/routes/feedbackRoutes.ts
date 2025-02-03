@@ -4,7 +4,7 @@ import { authenticate } from "../utils/authenticate";
 
 const router = express.Router();
 
-router.get("/:restaurant_id", fetchFeedback);
+router.get("/:restaurant_id", fetchFeedback); // Ensure this path matches the frontend request
 
 router.post("/", authenticate, addFeedbackHandler);
 

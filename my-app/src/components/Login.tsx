@@ -1,36 +1,55 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
-import { handleSubmit } from "../utils/handleSubmit"; // Updated import
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import './Login.css';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleForgotPasswordClick = () => {
+    navigate(`/forgot-password`);
   };
-
-  const onSubmit = (e: React.FormEvent) => {
+  const handleSignupClick = () => {
+    navigate(`/signup`);
+  };
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    handleSubmit(
-      "http://localhost:3000/api/users/login",
-      formData,
-      setMessage,
-      navigate,
-      "/profile"
-    );
+    try {
+      const response = await axios.post("http://localhost:3000/api/users/login", { email, password });
+      localStorage.setItem("token", response.data.token);
+      navigate("/profile");
+    } catch (error: any) {
+      setMessage(error.response?.data.error || "An error occurred");
+    }
   };
 
   return (
-    <div>
+    <div className="container">
       <h1>Login</h1>
-      <form onSubmit={onSubmit}>
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} />
+      {message && <p>{message}</p>}
+      <form onSubmit={handleLogin}>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
         <button type="submit">Login</button>
       </form>
-      {message && <p>{message}</p>}
+      <button onClick={handleForgotPasswordClick}>forgot password</button>
+      <button onClick={handleSignupClick}>Don't have an account? Sign up</button>
     </div>
   );
 };

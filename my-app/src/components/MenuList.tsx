@@ -1,31 +1,92 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-
-type Menu = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image?: string;
-};
+import { Menu } from "../types/menu"; // Ensure the casing matches the actual file name
 
 const MenuList = () => {
   const { restaurantId } = useParams();
   const [menus, setMenus] = useState<Menu[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [likedMenus, setLikedMenus] = useState<number[]>([]); // Track liked menus
 
   useEffect(() => {
     const fetchMenus = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/restaurant/${restaurantId}/menus`);
+        const response = await axios.get(`http://localhost:3000/api/menu/${restaurantId}`);
         setMenus(response.data);
-      } catch (error) {
+      } catch (error: any) {
+        setError("Error fetching menus");
         console.error("Error fetching menus:", error);
       }
     };
 
     fetchMenus();
   }, [restaurantId]);
+
+  useEffect(() => {
+    const fetchLikedMenus = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const response = await axios.get(`http://localhost:3000/api/menuLikes/user/likes`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const likedMenuIds = Array.isArray(response.data) ? response.data.map((like: any) => like.menu_id) : [];
+        setLikedMenus(likedMenuIds);
+      } catch (error: any) {
+        console.error("Error fetching liked menus:", error);
+      }
+    };
+
+    fetchLikedMenus();
+  }, []);
+
+  const handleToggleLike = async (menuId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("You must be logged in to like or unlike a menu.");
+        return;
+      }
+
+      if (likedMenus.includes(menuId)) {
+        // Remove like
+        await axios.delete(`http://localhost:3000/api/menuLikes`, {
+          data: { menu_id: menuId },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setLikedMenus((prev) => prev.filter((id) => id !== menuId));
+      } else {
+        // Add like
+        await axios.post(
+          `http://localhost:3000/api/menuLikes`,
+          { menu_id: menuId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setLikedMenus((prev) => [...prev, menuId]);
+      }
+    } catch (error: any) {
+      setError(`Error toggling like: ${error.response?.data?.error || error.message}`);
+      console.error("Error toggling like:", error);
+    }
+  };
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!Array.isArray(menus)) {
+    return <div>No menus available</div>;
+  }
 
   return (
     <div>
@@ -37,6 +98,9 @@ const MenuList = () => {
             <p>{menu.description}</p>
             <p>{menu.price}</p>
             {menu.image && <img src={menu.image} alt={menu.name} />}
+            <button onClick={() => handleToggleLike(menu.id)}>
+              {likedMenus.includes(menu.id) ? "Unlike" : "Like"}
+            </button>
           </li>
         ))}
       </ul>
